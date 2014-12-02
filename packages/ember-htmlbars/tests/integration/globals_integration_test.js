@@ -21,7 +21,6 @@ QUnit.module('ember-htmlbars: Integration with Globals', {
 
   teardown: function() {
     destroyView(view);
-
     view = null;
 
     Ember.lookup = lookup = originalLookup;

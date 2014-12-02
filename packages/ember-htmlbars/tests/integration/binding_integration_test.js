@@ -34,10 +34,8 @@ QUnit.module('ember-htmlbars: binding integration', {
   teardown: function() {
     Ember.lookup = originalLookup;
 
-    run(function() {
-      destroyView(view);
-      view = null;
-    });
+    destroyView(view);
+    view = null;
 
     MyApp = null;
   }

@@ -5,6 +5,7 @@ import EmberView from "ember-views/views/view";
 import htmlbarsCompile from "ember-htmlbars/system/compile";
 import { set } from "ember-metal/property_set";
 import Controller from "ember-runtime/controllers/controller";
+import { appendView, destroyView } from "ember-views/tests/view_helpers";
 
 var compile;
 if (Ember.FEATURES.isEnabled('ember-htmlbars')) {
@@ -15,15 +16,9 @@ if (Ember.FEATURES.isEnabled('ember-htmlbars')) {
 
 var view;
 
-var appendView = function(view) {
-  run(function() { view.appendTo('#qunit-fixture'); });
-};
-
 QUnit.module("Handlebars {{link-to}} helper", {
   teardown: function() {
-    run(function() {
-      if (view) { view.destroy(); }
-    });
+    destroyView(view);
   }
 });
 

@@ -66,15 +66,9 @@ QUnit.module("ember-htmlbars: {{#view}} helper", {
   },
 
   teardown: function() {
-    run(function() {
-      if (container) {
-        container.destroy();
-      }
-      if (view) {
-        view.destroy();
-      }
-      container = view = null;
-    });
+    destroyView(container);
+    destroyView(view);
+    container = view = null;
 
     Ember.lookup = lookup = originalLookup;
   }

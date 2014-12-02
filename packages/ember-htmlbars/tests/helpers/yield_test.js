@@ -15,7 +15,7 @@ import {
 
 import EmberHandlebars from "ember-handlebars";
 import htmlbarsCompile from "ember-htmlbars/system/compile";
-import { appendView } from "ember-views/tests/view_helpers";
+import { appendView, destroyView } from "ember-views/tests/view_helpers";
 
 var compile, helper;
 if (Ember.FEATURES.isEnabled('ember-htmlbars')) {
@@ -36,10 +36,8 @@ QUnit.module("ember-htmlbars: Support for {{yield}} helper", {
   teardown: function() {
     run(function() {
       Ember.TEMPLATES = {};
-      if (view) {
-        view.destroy();
-      }
     });
+    destroyView(view);
   }
 });
 
@@ -298,9 +296,7 @@ test("adding a layout should not affect the context of normal views", function()
 
   equal(view.$().text(), "Layout: View context: ViewContext");
 
-  run(function() {
-    parentView.destroy();
-  });
+  destroyView(parentView);
 });
 
 test("yield should work for views even if _parentView is null", function() {
@@ -320,13 +316,9 @@ test("yield should work for views even if _parentView is null", function() {
 QUnit.module("ember-htmlbars: Component {{yield}}", {
   setup: function() {},
   teardown: function() {
-    run(function() {
-      if (view) {
-        view.destroy();
-      }
-      delete helpers['inner-component'];
-      delete helpers['outer-component'];
-    });
+    destroyView(view);
+    delete helpers['inner-component'];
+    delete helpers['outer-component'];
   }
 });
 

@@ -31,6 +31,11 @@ import {
   actionHelper as htmlbarsActionHelper
 } from "ember-routing-htmlbars/helpers/action";
 
+import {
+  appendView,
+  destroyView
+} from "ember-views/tests/view_helpers";
+
 var compile, helpers, registerHelper, ActionHelper, actionHelper;
 if (Ember.FEATURES.isEnabled('ember-htmlbars')) {
   helpers = htmlbarsHelpers;
@@ -51,10 +56,6 @@ if (Ember.FEATURES.isEnabled('ember-htmlbars')) {
 var dispatcher, view, originalActionHelper;
 var originalRegisterAction = ActionHelper.registerAction;
 
-var appendView = function() {
-  run(function() { view.appendTo('#qunit-fixture'); });
-};
-
 QUnit.module("ember-routing-htmlbars: action helper", {
   setup: function() {
     originalActionHelper = helpers['action'];
@@ -65,9 +66,9 @@ QUnit.module("ember-routing-htmlbars: action helper", {
   },
 
   teardown: function() {
+    destroyView(view);
     run(function() {
       dispatcher.destroy();
-      if (view) { view.destroy(); }
     });
 
     delete helpers['action'];
@@ -80,7 +81,7 @@ test("should output a data attribute with a guid", function() {
     template: compile('<a href="#" {{action "edit"}}>edit</a>')
   });
 
-  appendView();
+  appendView(view);
 
   ok(view.$('a').attr('data-ember-action').match(/\d+/), "A data-ember-action attribute with a guid was added");
 });
@@ -96,7 +97,7 @@ test("should by default register a click event", function() {
     template: compile('<a href="#" {{action "edit"}}>edit</a>')
   });
 
-  appendView();
+  appendView(view);
 
   equal(registeredEventName, 'click', "The click event was properly registered");
 
@@ -114,7 +115,7 @@ test("should allow alternative events to be handled", function() {
     template: compile('<a href="#" {{action "edit" on="mouseUp"}}>edit</a>')
   });
 
-  appendView();
+  appendView(view);
 
   equal(registeredEventName, 'mouseUp', "The alternative mouseUp event was properly registered");
 
@@ -134,7 +135,7 @@ test("should by default target the view's controller", function() {
     template: compile('<a href="#" {{action "edit"}}>edit</a>')
   });
 
-  appendView();
+  appendView(view);
 
   equal(registeredTarget, controller, "The controller was registered as the target");
 
@@ -163,7 +164,7 @@ test("Inside a yield, the target points at the original target", function() {
     template: compile('{{#if truthy}}{{#view component}}{{#if truthy}}<div {{action "wat"}} class="wat">{{boundText}}</div>{{/if}}{{/view}}{{/if}}')
   });
 
-  appendView();
+  appendView(view);
 
   run(function() {
     view.$(".wat").click();
@@ -199,7 +200,7 @@ test("should target the current controller inside an {{each}} loop [DEPRECATED]"
   });
 
   expectDeprecation(function() {
-    appendView();
+    appendView(view);
   }, 'Using the context switching form of {{each}} is deprecated. Please use the keyword form (`{{#each foo in bar}}`) instead. See http://emberjs.com/guides/deprecations/#toc_more-consistent-handlebars-scope for more details.');
 
   equal(registeredTarget, itemController, "the item controller is the target of action");
@@ -231,7 +232,7 @@ test("should target the with-controller inside an {{#with controller='person'}} 
   container.register('controller:person', PersonController);
 
   expectDeprecation(function() {
-    appendView();
+    appendView(view);
   }, 'Using the context switching form of `{{with}}` is deprecated. Please use the keyword form (`{{with foo as bar}}`) instead. See http://emberjs.com/guides/deprecations/#toc_more-consistent-handlebars-scope for more details.');
 
   ok(registeredTarget instanceof PersonController, "the with-controller is the target of action");
@@ -269,7 +270,7 @@ test("should target the with-controller inside an {{each}} in a {{#with controll
 
   container.register('controller:people', PeopleController);
 
-  appendView();
+  appendView(view);
 
   view.$('a').trigger('click');
 
@@ -291,15 +292,13 @@ test("should allow a target to be specified", function() {
     anotherTarget: anotherTarget
   });
 
-  appendView();
+  appendView(view);
 
   equal(registeredTarget, anotherTarget, "The specified target was registered");
 
   ActionHelper.registerAction = originalRegisterAction;
 
-  run(function() {
-    anotherTarget.destroy();
-  });
+  destroyView(anotherTarget);
 });
 
 test("should lazily evaluate the target", function() {
@@ -325,7 +324,7 @@ test("should lazily evaluate the target", function() {
     template: compile('<a href="#" {{action "edit" target=theTarget}}>edit</a>')
   });
 
-  appendView();
+  appendView(view);
 
   run(function() {
     jQuery('a').trigger('click');
@@ -357,7 +356,7 @@ test("should register an event handler", function() {
     template: compile('<a href="#" {{action "edit"}}>click me</a>')
   });
 
-  appendView();
+  appendView(view);
 
   var actionId = view.$('a[data-ember-action]').attr('data-ember-action');
 
@@ -384,7 +383,7 @@ test("handles whitelisted modifier keys", function() {
     template: compile('<a href="#" {{action "edit" allowedKeys="alt"}}>click me</a> <div {{action "shortcut" allowedKeys="any"}}>click me too</div>')
   });
 
-  appendView();
+  appendView(view);
 
   var actionId = view.$('a[data-ember-action]').attr('data-ember-action');
 
@@ -423,7 +422,7 @@ test("should be able to use action more than once for the same event within a vi
     click: function() { originalEventHandlerWasCalled = true; }
   });
 
-  appendView();
+  appendView(view);
 
   view.$('#edit').trigger('click');
 
@@ -465,7 +464,7 @@ test("the event should not bubble if `bubbles=false` is passed", function() {
     click: function() { originalEventHandlerWasCalled = true; }
   });
 
-  appendView();
+  appendView(view);
 
   view.$('#edit').trigger('click');
 
@@ -503,7 +502,7 @@ test("should work properly in an #each block", function() {
     template: compile('{{#each item in view.items}}<a href="#" {{action "edit"}}>click me</a>{{/each}}')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('a').trigger('click');
 
@@ -523,7 +522,7 @@ test("should work properly in a {{#with foo as bar}} block", function() {
     template: compile('{{#with view.something as somethingElse}}<a href="#" {{action "edit"}}>click me</a>{{/with}}')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('a').trigger('click');
 
@@ -544,7 +543,7 @@ test("should work properly in a #with block [DEPRECATED]", function() {
   });
 
   expectDeprecation(function() {
-    appendView();
+    appendView(view);
   }, 'Using the context switching form of `{{with}}` is deprecated. Please use the keyword form (`{{with foo as bar}}`) instead. See http://emberjs.com/guides/deprecations/#toc_more-consistent-handlebars-scope for more details.');
 
   view.$('a').trigger('click');
@@ -560,7 +559,7 @@ test("should unregister event handlers on rerender", function() {
     actions: { edit: function() { eventHandlerWasCalled = true; } }
   }).create();
 
-  appendView();
+  appendView(view);
 
   var previousActionId = view.$('a[data-ember-action]').attr('data-ember-action');
 
@@ -586,7 +585,7 @@ test("should unregister event handlers on inside virtual views", function() {
     things: things
   });
 
-  appendView();
+  appendView(view);
 
   var actionId = view.$('a[data-ember-action]').attr('data-ember-action');
 
@@ -609,7 +608,7 @@ test("should properly capture events on child elements of a container with an ac
     template: compile('<div {{action "edit"}}><button>click me</button></div>')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('button').trigger('click');
 
@@ -630,7 +629,7 @@ test("should allow bubbling of events from action helper to original parent even
     click: function() { originalEventHandlerWasCalled = true; }
   });
 
-  appendView();
+  appendView(view);
 
   view.$('a').trigger('click');
 
@@ -651,7 +650,7 @@ test("should not bubble an event from action helper to original parent event if 
     click: function() { originalEventHandlerWasCalled = true; }
   });
 
-  appendView();
+  appendView(view);
 
   view.$('a').trigger('click');
 
@@ -671,7 +670,7 @@ test("should allow 'send' as action name (#594)", function() {
     template: compile('<a href="#" {{action "send" }}>send</a>')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('a').trigger('click');
 
@@ -699,7 +698,7 @@ test("should send the view, event and current context to the action", function()
     template: compile('<a id="edit" href="#" {{action "edit" this target=aTarget}}>edit</a>')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('#edit').trigger('click');
 
@@ -715,7 +714,7 @@ test("should only trigger actions for the event they were registered on", functi
     actions: { edit: function() { editWasCalled = true; } }
   }).create();
 
-  appendView();
+  appendView(view);
 
   view.$('a').trigger('mouseover');
 
@@ -739,7 +738,7 @@ test("should unwrap controllers passed as a context", function() {
     template: compile('<button {{action "edit" this}}>edit</button>')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('button').trigger('click');
 
@@ -763,7 +762,7 @@ test("should not unwrap controllers passed as `controller`", function() {
     template: compile('<button {{action "edit" controller}}>edit</button>')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('button').trigger('click');
 
@@ -789,7 +788,7 @@ test("should allow multiple contexts to be specified", function() {
     template: compile('<button {{action "edit" view.modelA view.modelB}}>edit</button>')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('button').trigger('click');
 
@@ -814,7 +813,7 @@ test("should allow multiple contexts to be specified mixed with string args", fu
     template: compile('<button {{action "edit" "herp" view.modelA}}>edit</button>')
   });
 
-  appendView();
+  appendView(view);
 
   view.$('button').trigger('click');
 
@@ -1157,9 +1156,9 @@ QUnit.module("ember-routing-htmlbars: action helper - deprecated invoking direct
     delete helpers['action'];
     helpers['action'] = originalActionHelper;
 
+    destroyView(view);
     run(function() {
       dispatcher.destroy();
-      if (view) { view.destroy(); }
     });
   }
 });
@@ -1177,7 +1176,7 @@ test("should respect preventDefault=false option if provided", function(){
 
   run(function() {
     view.set('controller', controller);
-    view.appendTo('#qunit-fixture');
+    appendView(view);
   });
 
   var event = jQuery.Event("click");

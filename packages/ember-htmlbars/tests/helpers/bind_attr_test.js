@@ -11,7 +11,7 @@ import { computed } from "ember-metal/computed";
 import { observersFor } from "ember-metal/observer";
 import Container from "ember-runtime/system/container";
 import { set } from "ember-metal/property_set";
-import { appendView } from "ember-views/tests/view_helpers";
+import { appendView, destroyView } from "ember-views/tests/view_helpers";
 
 import {
   default as htmlbarsHelpers
@@ -50,15 +50,10 @@ QUnit.module("ember-htmlbars: {{bind-attr}}", {
   },
 
   teardown: function() {
-    run(function() {
-        if (container) {
-          container.destroy();
-        }
-        if (view) {
-          view.destroy();
-        }
-        container = view = null;
-    });
+    destroyView(container);
+    destroyView(view);
+    container = view = null;
+
     Ember.lookup = lookup = originalLookup;
     TemplateTests = null;
   }

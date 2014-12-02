@@ -7,7 +7,7 @@ import EmberObject from 'ember-runtime/system/object';
 import _MetamorphView from 'ember-views/views/metamorph_view';
 import EmberHandlebars from 'ember-handlebars';
 import htmlbarsCompile from 'ember-htmlbars/system/compile';
-import { appendView } from "ember-views/tests/view_helpers";
+import { appendView, destroyView } from "ember-views/tests/view_helpers";
 
 import { set } from 'ember-metal/property_set';
 
@@ -31,17 +31,9 @@ QUnit.module('ember-htmlbars: {{#with}} and {{#view}} integration', {
   },
 
   teardown: function() {
-    run(function() {
-      if (container) {
-        container.destroy();
-      }
-
-      if (view) {
-        view.destroy();
-      }
-
-      container = view = null;
-    });
+    destroyView(container);
+    destroyView(view);
+    container = view = null;
   }
 });
 

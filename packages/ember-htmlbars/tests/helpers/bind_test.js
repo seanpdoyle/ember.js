@@ -28,16 +28,9 @@ QUnit.module("ember-htmlbars: {{bind}} helper", {
     container.register('view:toplevel', EmberView.extend());
   },
   teardown: function() {
-    run(function() {
-      if (container) {
-        container.destroy();
-      }
-      if (view) {
-        view.destroy();
-      }
-
-      container = view = null;
-    });
+    destroyView(container);
+    destroyView(view);
+    container = view = null;
   }
 });
 
@@ -102,14 +95,8 @@ QUnit.module("ember-htmlbars: {{bind}} with a container, block forms", {
     container.optionsForType('template', { instantiate: false });
   },
   teardown: function() {
-    run(function(){
-      if (container) {
-        container.destroy();
-      }
-      if (view) {
-        view.destroy();
-      }
-    });
+    destroyView(container);
+    destroyView(view);
     container = view = null;
   }
 });

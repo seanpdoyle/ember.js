@@ -3,12 +3,9 @@ import run from "ember-metal/run_loop";
 import Container from "container";
 import makeBoundHelper from "ember-htmlbars/system/make_bound_helper";
 import compile from "ember-htmlbars/system/compile";
+import { appendView, destroyView } from "ember-views/views/view_helpers";
 
 var view, container;
-
-function appendView(view) {
-  run(view, 'appendTo', '#qunit-fixture');
-}
 
 function registerRepeatHelper() {
   container.register('helper:x-repeat', makeBoundHelper(function(params, hash, options, env) {
@@ -25,11 +22,8 @@ QUnit.module("ember-htmlbars: makeBoundHelper", {
   },
 
   teardown: function() {
-    if (view) {
-      run(view, 'destroy');
-    }
-
-    container.destroy();
+    destroyView(container);
+    destroyView(view);
   }
 });
 

@@ -35,7 +35,6 @@ QUnit.module("ember-htmlbars: block params", {
     delete helpers.alias;
 
     destroyView(container);
-
     destroyView(view);
   }
 });

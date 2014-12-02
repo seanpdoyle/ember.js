@@ -28,6 +28,7 @@ import { outletHelper as htmlbarsOutletHelper } from "ember-routing-htmlbars/hel
 import htmlbarsCompile from "ember-htmlbars/system/compile";
 import { registerHelper as htmlbarsRegisterHelper } from "ember-htmlbars/helpers";
 import htmlbarsHelpers from "ember-htmlbars/helpers";
+import { appendView, destroyView } from "ember-views/tests/view_helpers";
 
 var compile, helpers, registerHelper, outletHelper;
 if (Ember.FEATURES.isEnabled('ember-htmlbars')) {
@@ -85,10 +86,6 @@ function resolverFor(namespace) {
   };
 }
 
-var appendView = function(view) {
-  run(function() { view.appendTo('#qunit-fixture'); });
-};
-
 var trim = jQuery.trim;
 
 var view, container, originalOutletHelper;
@@ -108,14 +105,8 @@ QUnit.module("ember-routing-htmlbars: {{outlet}} helper", {
     delete helpers['outlet'];
     helpers['outlet'] = originalOutletHelper;
 
-    run(function () {
-      if (container) {
-        container.destroy();
-      }
-      if (view) {
-        view.destroy();
-      }
-    });
+    destroyView(container);
+    destroyView(view);
   }
 });
 

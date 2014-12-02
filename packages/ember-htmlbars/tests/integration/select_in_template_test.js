@@ -10,7 +10,7 @@ import ArrayProxy from "ember-runtime/system/array_proxy";
 import SelectView from "ember-views/views/select";
 import EmberHandlebars from 'ember-handlebars-compiler';
 import { default as htmlbarsCompile } from 'ember-htmlbars/system/compile';
-import { appendView } from "ember-views/tests/view_helpers";
+import { appendView, destroyView } from "ember-views/tests/view_helpers";
 
 var dispatcher, view;
 
@@ -30,7 +30,7 @@ QUnit.module("ember-htmlbars: Ember.Select - usage inside templates", {
   teardown: function() {
     run(function() {
       dispatcher.destroy();
-      if (view) { view.destroy(); }
+      destroyView(view);
     });
   }
 });

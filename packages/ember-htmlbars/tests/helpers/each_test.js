@@ -111,15 +111,10 @@ QUnit.module("the #each helper [DEPRECATED]", {
   },
 
   teardown: function() {
-    run(function() {
-        if (container) {
-          container.destroy();
-        }
-        if (view) {
-          view.destroy();
-        }
-        container = view = null;
-    });
+    destroyView(container);
+    destroyView(view);
+    container = view = null;
+
     Ember.lookup = originalLookup;
   }
 });

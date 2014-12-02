@@ -1,6 +1,8 @@
 import jQuery from "ember-views/system/jquery";
 import run from "ember-metal/run_loop";
 import EmberView from "ember-views/views/view";
+import { destroyView } from "ember-views/tests/view_helpers";
+
 var trim = jQuery.trim;
 
 var originalLookup = Ember.lookup;
@@ -14,7 +16,7 @@ QUnit.module("ember-htmlbars: bootstrap", {
     Ember.TEMPLATES = {};
     Ember.lookup = originalLookup;
     if(App) { run(App, 'destroy'); }
-    if (view) { run(view, 'destroy'); }
+    destroyView(view);
   }
 });
 
@@ -36,9 +38,7 @@ function checkTemplate(templateName) {
     view.createElement();
   });
   equal(trim(view.$().text()), 'Tobias takes teamocil', 'template works');
-  run(function() {
-    view.destroy();
-  });
+  destroyView(view);
 }
 
 test('template with data-template-name should add a new template to Ember.TEMPLATES', function() {

@@ -51,15 +51,10 @@ QUnit.module("collection helper", {
   },
 
   teardown: function() {
-    run(function() {
-        if (container) {
-          container.destroy();
-        }
-        if (view) {
-          view.destroy();
-        }
-        container = view = null;
-    });
+    destroyView(container);
+    destroyView(view);
+    container = view = null;
+
     Ember.lookup = lookup = originalLookup;
     TemplateTests = null;
   }
@@ -101,7 +96,7 @@ test("itemViewClass works in the #collection helper with a global (DEPRECATED)",
     deprecation = /Global lookup of TemplateTests.ExampleItemView from a Handlebars template is deprecated/;
   }
   expectDeprecation(function(){
-    run(view, 'append');
+    appendView(view);
   }, deprecation);
 
   ok(firstGrandchild(view).isAlsoCustom, "uses the example view class specified in the #collection helper");

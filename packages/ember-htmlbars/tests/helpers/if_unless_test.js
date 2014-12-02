@@ -12,7 +12,7 @@ import { set } from 'ember-metal/property_set';
 import { fmt } from 'ember-runtime/system/string';
 import { typeOf } from 'ember-metal/utils';
 import { forEach } from 'ember-metal/enumerable_utils';
-import { appendView } from "ember-views/tests/view_helpers";
+import { appendView, destroyView } from "ember-views/tests/view_helpers";
 
 var compile;
 if (Ember.FEATURES.isEnabled('ember-htmlbars')) {
@@ -36,15 +36,9 @@ QUnit.module("ember-htmlbars: {{#if}} and {{#unless}} helpers", {
   },
 
   teardown: function() {
-    run(function() {
-      if (container) {
-        container.destroy();
-      }
-      if (view) {
-        view.destroy();
-      }
-      container = view = null;
-    });
+    destroyView(container);
+    destroyView(view);
+    container = view = null;
 
     Ember.lookup = lookup = originalLookup;
     TemplateTests = null;
